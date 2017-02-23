@@ -93,7 +93,8 @@ announcement message; that is done by having a signature from each
     * [2:len]
     * [len:features]
 
-### Requirements [Requirements for channel_announcement]
+<a name="requirements-for-channel_announcement">
+### [Requirements][Requirements for channel_announcement]
 
 The creating node MUST set `channel-id` to refer to the confirmed
 funding transaction as specified in [BOLT #2](02-peer-protocol.md#the-funding_locked-message).  The corresponding output MUST be a

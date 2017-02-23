@@ -1,16 +1,5 @@
 # BOLT #7: P2P Node and Channel Discovery
 
-## Table of Contents
-  * [The announcement_signatures Message](#the-announcement_signatures-message)
-  * [Lightning Message Format](#lightning-message-format)
-  * [Setup Messages](#setup-messages)
-    * [The `init` message](#the-init-message)
-    * [The `error` message](#the-error-message)
-  * [Acknowledgements](#acknowledgements)
-  * [References](#references)
-  * [Authors](#authors)
-
-
 This specification describes simple node discovery, channel discovery and channel update mechanisms which do not rely on a third-party to disseminate the information.
 
 Node and channel discovery serve two different purposes:
@@ -23,6 +12,25 @@ Peers in the network exchange `channel_announcement` messages that contain infor
 There can only be one valid `channel_announcement` for any channel,
 but multiple `node_announcement` messages are possible (to update node
 information), and at least two `channel_update` messages are expected.
+
+## Table of Contents
+
+  * [The `announcement_signatures` Message](#the-announcement_signatures-message)
+  * [The `channel_announcement` Message](#the-channel_announcement-message)
+    * [Requirements](#requirements-for-channel_announcement)
+    * [Rationale](#rationale-for-channel_announcement)
+  * [The `node_announcement` Message](#the-node_announcement-message)
+    * [Requirements](#requirements-for-node_announcement)
+    * [Rationale](#rationale-for-node_announcement)
+  * [The `channel_update` Message](#the-channel_update-message)
+    * [Requirements](#requirements-for-channel_update)
+  * [Initial Sync](#initial-sync)
+  * [Rebroadcasting](#rebroadcasting)
+    * [Requirements](#requirements-for-rebroadcasting)
+    * [Rationale](#rationale-for-rebroadcasting)
+  * [HTLC Fees](#htlc-fees)
+  * [Recommendations for Routing](#recommendations-for-routing)
+  * [References](#references)
 
 ## The `announcement_signatures` message
 This is a direct message between two endpoints of a channel and serves as an opt-in mechanism to allow the announcement of the channel to the rest of the network.
@@ -85,7 +93,7 @@ announcement message; that is done by having a signature from each
     * [2:len]
     * [len:features]
 
-### Requirements
+### Requirements [Requirements for channel_announcement]
 
 The creating node MUST set `channel-id` to refer to the confirmed
 funding transaction as specified in [BOLT #2](02-peer-protocol.md#the-funding_locked-message).  The corresponding output MUST be a
@@ -135,7 +143,7 @@ unknown `feature` bit set which is even.
 The receiving node SHOULD forget a channel once its funding output has
 been spent or reorganized out.
 
-### Rationale
+### Rationale [Rationale for channel_announcement]
 
 Requiring both nodes to sign indicates they are both willing to route
 other payments via this node (ie. take part of the public network).
@@ -192,7 +200,7 @@ The following `address descriptor` types are defined:
 1. `1`: IPv4. data = `[4:ipv4-addr][2:port]` (length 6)
 2. `2`: IPv6. data = `[16:ipv6-addr][2:port]` (length 18)
 
-### Requirements
+### Requirements [Requirements for node_announcement]
 
 The creating node MUST set `timestamp` to be greater than any previous
 `node_announcement` it has created.  It MAY base it on a UNIX
@@ -242,7 +250,7 @@ The receiving node SHOULD NOT connect to a node which has an unknown
 
 The receiving node MAY use `rgb` and `alias` to reference nodes in interfaces, but SHOULD insinuate their self-signed origin.
 
-### Rationale
+### Rationale [Rationale for node_announcement]
 
 New node features are possible in future; backwards compatible (or
 optional) ones will have odd feature bits, incompatible ones will have
@@ -273,7 +281,7 @@ it wants to change fees.
     * [4:fee-base-msat]
     * [4:fee-proportional-millionths]
 
-### Requirements
+### Requirements [Requirements for channel_update]
 
 The creating node MUST set `signature` to the signature of the
 double-SHA256 of the entire remaining packet after `signature` using its own `node-id`.
@@ -327,7 +335,7 @@ This will later allow the receiving node to rebuild the announcement for its pee
 
 After processing the announcement the receiving node adds the announcement to a list of outgoing announcements.
 
-### Requirements
+### Requirements [Requirements for Rebroadcasting]
 
 Each node SHOULD flush outgoing announcements once every 60 seconds, independently of the arrival times of announcements, resulting in a staggered announcement and deduplication of announcements.
 
@@ -337,7 +345,7 @@ Nodes SHOULD send all `channel_announcement` messages followed by the
 latest `node_announcement` and `channel_update` messages upon
 connection establishment.
 
-### Rationale
+### Rationale [Rationale for Rebroadcasting]
 
 Batching announcements form a natural ratelimit with low overhead.
 

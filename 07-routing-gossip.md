@@ -1,5 +1,16 @@
 # BOLT #7: P2P Node and Channel Discovery
 
+## Table of Contents
+  * [The announcement_signatures Message](#the-announcement_signatures-message)
+  * [Lightning Message Format](#lightning-message-format)
+  * [Setup Messages](#setup-messages)
+    * [The `init` message](#the-init-message)
+    * [The `error` message](#the-error-message)
+  * [Acknowledgements](#acknowledgements)
+  * [References](#references)
+  * [Authors](#authors)
+
+
 This specification describes simple node discovery, channel discovery and channel update mechanisms which do not rely on a third-party to disseminate the information.
 
 Node and channel discovery serve two different purposes:
